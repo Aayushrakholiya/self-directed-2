@@ -21,6 +21,37 @@ typedef struct {
 Flight flights[100];
 int num_flights = 0;
 
+int main() {
+    char filename[256];
+    FILE* file;
+    errno_t err = fopen_s(&file, "flights.txt", "r");
+    if (err != 0) {
+        printf("Cannot open file: flights.txt\n");
+        return 1;
+    }
+
+    while (fgets(filename, sizeof(filename), file)) {
+        // Remove the newline character from the filename
+        filename[strcspn(filename, "\n")] = 0;
+
+        // Skip empty lines
+        if (strcmp(filename, "") == 0) {
+            continue;
+        }
+
+        processFlight(filename, flights, &num_flights);
+    }
+
+    fclose(file);
+
+    // Add a blank line before displaying the fare details
+    printf("\n");
+
+    displayLeastFareDetails(flights, num_flights);
+
+    return 0;
+}
+
 int parseLine(char* line, char* filename, char* source, char* destination, int* fare) {
     char* comma = strchr(line, ',');
     char* dash = strchr(line, '-');
@@ -64,4 +95,25 @@ int processFlight(char* filename, Flight* flights, int* num_flights) {
 
     fclose(file);
     return 0;
+}
+
+void displayLeastFareDetails(Flight* flights, int num_flights) {
+    int processed[100] = { 0 };
+
+    for (int i = 0; i < num_flights; i++) {
+        if (processed[i]) {
+            continue;
+        }
+
+        Flight min_fare_flight = flights[i];
+        for (int j = i + 1; j < num_flights; j++) {
+            if (strcmp(flights[i].source, flights[j].source) == 0 && strcmp(flights[i].destination, flights[j].destination) == 0) {
+                processed[j] = 1;
+                if (flights[j].fare < min_fare_flight.fare) {
+                    min_fare_flight = flights[j];
+                }
+            }
+        }
+        printf("%s : %s to %s, fare $%d\n", min_fare_flight.airline, min_fare_flight.source, min_fare_flight.destination, min_fare_flight.fare);
+    }
 }
