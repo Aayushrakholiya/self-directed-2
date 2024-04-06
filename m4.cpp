@@ -21,6 +21,12 @@ typedef struct {
 Flight flights[100];
 int num_flights = 0;
 
+
+int parseLine(char* line, char* filename, char* source, char* destination, int* fare);
+int processFlight(char* filename, Flight* flights, int* num_flights);
+void displayLeastFareDetails(Flight* flights, int num_flights);
+
+
 int main() {
     char filename[256];
     FILE* file;
@@ -52,6 +58,17 @@ int main() {
     return 0;
 }
 
+/*
+Function: getDouble()
+
+Parameter: char* line, char* filename, char* source, char* destination, int* fare
+
+Return Value: int
+
+Description: this function will extracts the source, destination, and fare from the line.
+             if the line is in properly formatted it will print and return -1.
+*/
+
 int parseLine(char* line, char* filename, char* source, char* destination, int* fare) {
     char* comma = strchr(line, ',');
     char* dash = strchr(line, '-');
@@ -69,6 +86,17 @@ int parseLine(char* line, char* filename, char* source, char* destination, int* 
         return 0;
     }
 }
+
+/*
+Function: processFlight()
+
+Parameter: char* filename, Flight* flights, int* num_flights
+
+Return Value: int
+
+Description: this function will open a flight data file for reading each line. 
+             it will skips empty line and calls parseline() to process each line
+*/
 
 int processFlight(char* filename, Flight* flights, int* num_flights) {
     FILE* file;
@@ -96,6 +124,17 @@ int processFlight(char* filename, Flight* flights, int* num_flights) {
     fclose(file);
     return 0;
 }
+
+/*
+Function: displayLeastFareDetails()
+
+Parameter: Flight* flights, int num_flights
+
+Return Value: void
+
+Description: this function will finds the flight with the least fare for each source-destination 
+             flight and prints the information of the flights
+*/
 
 void displayLeastFareDetails(Flight* flights, int num_flights) {
     int processed[100] = { 0 };
